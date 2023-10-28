@@ -150,6 +150,13 @@ class CrawlerThread(QThread):
                                 break
                         else:
                             driver.refresh()
+                            if main.iselement(driver, '//*[@id="content_read"]/div/div[3]/a[3]'):
+                                if self.url != driver.find_element_by_xpath(
+                                        '//*[@id="content_read"]/div/div[3]/a[3]').get_attribute('href'):
+                                    driver.find_element_by_xpath('//*[@id="content_read"]/div/div[3]/a[3]').click()
+                                else:
+                                    print(f'output/{filename}获取完毕')
+                                    break
                 else:
                     driver.find_element_by_xpath('//*[@id="list"]/dl/dd[1]/a').click()  # 点击第一章
             # close

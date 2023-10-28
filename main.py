@@ -93,8 +93,11 @@ def crawl_conten(driver, filename):
         file.write(content + '\n\n')
     # 存储进度
     with open('tmp/tmp_' + filename, 'w+', encoding='utf-8') as tmp:
-        tmp.write(driver.find_element_by_xpath('//*[@id="content_read"]/div/div[3]/a[3]').get_attribute('href'))
-    tmp.close()
+        if iselement(driver, '//*[@id="content_read"]/div/div[3]/a[3]'):
+            tmp.write(driver.find_element_by_xpath('//*[@id="content_read"]/div/div[3]/a[3]').get_attribute('href'))
+        else:
+            driver.refresh()
+            tmp.write(driver.find_element_by_xpath('//*[@id="content_read"]/div/div[3]/a[3]').get_attribute('href'))
 
 
 

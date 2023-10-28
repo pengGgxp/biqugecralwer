@@ -14,6 +14,7 @@ from PyQt5.QtCore import QProcess, QThread
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 import main
 from qtgui import Ui_MainWindow
@@ -26,6 +27,8 @@ def exceptOutConfig(exceptype, value, tb):
     print('Type:', exceptype)
     print('Value:', value)
     print('Traceback:', tb)
+
+
 
 
 class EmittingStr(QtCore.QObject):
@@ -98,7 +101,7 @@ class CrawlerThread(QThread):
 
     def run(self):
         #run_selenium_crawler(self.url)  # 在这里执行你的爬虫任务
-        if not os.path.exists('chromedriver.exe'):
+        if not os.path.exists('chromedriver-win64/chromedriver.exe'):
             print('找不到谷歌开发浏览器模块，正在下载...')
             file = requests.get('https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/118.0.5993.70/win64/chromedriver-win64.zip')
             open('chromedriver-win64.zip', 'wb').write(file.content)
@@ -106,7 +109,7 @@ class CrawlerThread(QThread):
             shutil.unpack_archive(filename='chromedriver-win64.zip', format='zip')
             os.unlink('chromedriver-win64.zip')
             print('解压完成，正在启动程序')
-            print('如果启动失败，请检查是否安装谷歌浏览器')
+            print('如果启动失败，请检查是否已经安装谷歌浏览器')
 
 
 
@@ -202,7 +205,11 @@ class Outoutwritten(QMainWindow, Ui_MainWindow):
     def start_task(self):
         url = self.select_url.currentText()
         self.crawler_thread.url = url
-        self.crawler_thread.start()
+        try:
+            self.crawler_thread.start()
+        except NoSuchElementException:
+            self.crawler_thread.stop()
+            self.crawler_thread.start()
 
     def stop_task(self):
         self.crawler_thread.stop()

@@ -122,7 +122,10 @@ class CrawlerThread(QThread):
         driver = main.browser_process(self.driver, self.url)
         url_new, filename = main.create_file_and_write_novelname(driver, self.url)
         driver = main.browser_process(driver, url_new)
+        num = 0
         while self._stop:
+            num += 1
+            print(f'正在获取-第{num}个链接')
             if main.iselement(driver, '//*[@id="content_read"]/div/div[2]/h1'):
                 title = driver.find_element_by_xpath('//*[@id="content_read"]/div/div[2]/h1').text  # 获取标题
                 if main.isrepeat(filename, title, List):
@@ -131,6 +134,13 @@ class CrawlerThread(QThread):
                     continue
                 else:
                     main.crawl_conten(driver, filename, self.url)
+                    # 点击下一章
+                    if self.url != driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').get_attribute(
+                            'href'):
+                        driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').click()
+                    else:
+                        print(f'output/{filename}获取完毕')
+                        break
             else:
                 driver.find_element_by_xpath('//*[@id="list"]/dl/dd[1]/a').click()  # 点击第一章
         # close
@@ -212,6 +222,7 @@ class Outoutwritten(QMainWindow, Ui_MainWindow):
             self.crawler_thread.start()
 
     def stop_task(self):
+        print('正在停止任务...')
         self.crawler_thread.stop()
 
     def on_crawler_finished(self):

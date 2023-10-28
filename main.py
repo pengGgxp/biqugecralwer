@@ -75,6 +75,7 @@ def isrepeat(filename, title, List):
         return False
 
 
+
 def crawl_conten(driver, filename, start):
     # 爬取内容
     if iselement(driver, '//*[@id="list"]/dl/dd[1]/a'):
@@ -84,32 +85,14 @@ def crawl_conten(driver, filename, start):
     title = driver.find_element_by_xpath('//*[@id="content_read"]/div/div[2]/h1').text
     content = driver.find_element_by_xpath('//*[@id="content"]').text
     with open('output/' + filename, 'a+', encoding='utf-8') as file:  # 存储文本
-        file.seek(0, 2)
-        print('开始存储本页...链接为：' + driver.current_url)
         file.write(title + '\n')
-        print('10%[**........]', end='\r')
         file.write('\n')
-        print('50%[*****.....]', end='\r')
         file.write(content + '\n\n')
-        print('90%[*********.]', end='\r')
-    print('100%[**********]')
     # 存储进度
     with open('tmp/tmp_' + filename, 'w+', encoding='utf-8') as tmp:
         tmp.write(driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').get_attribute('href'))
     tmp.close()
-    print('''
-        ***********
-        *进度已存储!*
-        ***********''')
-    # 点击下一章
-    # print(driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').get_attribute('href'))
-    if start != driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').get_attribute('href'):
-        driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').click()
-        # sleep(3)
-        print('正在获取下一页，链接为: ' + driver.find_element_by_xpath(
-            '//*[@id="content_read"]/div/div[6]/a[3]').get_attribute('href'))
-    else:
-        print(f'output/{filename}获取完毕')
+
 
 
 def main():

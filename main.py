@@ -9,7 +9,7 @@ import atexit
 import re
 
 
-def load_prograss(filename, url_old):
+def load_prograss(driver, filename, url_old):
     # 读取tmp文件中的进度
     try:
         with open('tmp/tmp_' + filename + '.txt', 'r', encoding='utf-8') as tmp:
@@ -22,10 +22,13 @@ def load_prograss(filename, url_old):
             else:
                 print(
                     f'已保存进度中的链接和输入的链接冲突，请检查是否已经下载完成！\t，如果仍要使用进度中的链接，请将"output/{filename}.txt"文件删除后重试')
+                driver.quit()
         else:
             print(f'正常读取进度失败，请尝试删除"output/{filename}.txt"文件删除后重试')
+            driver.quit()
     except:
         print(f'正常读取进度失败，请尝试删除"output/{filename}.txt"文件删除后重试')
+        driver.quit()
 
 
 def browser_process(driver, url):
@@ -47,7 +50,7 @@ def create_file_and_write_novelname(driver, url):
         return url, filename + '.txt'
     else:
         print('发现已保存的进度，即将获取...')
-        url2 = load_prograss(filename, url)
+        url2 = load_prograss(driver, filename, url)
         return url2, filename + '.txt'
 
 

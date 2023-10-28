@@ -112,42 +112,46 @@ class CrawlerThread(QThread):
             print('如果启动失败，请检查是否已经安装谷歌浏览器')
 
 
+        try:
+
+            self.driver = main.main()
+
+            List = [1]
+
+            # 进行爬取
+
+            driver = main.browser_process(self.driver, self.url)
+            url_new, filename = main.create_file_and_write_novelname(driver, self.url)
+            driver = main.browser_process(driver, url_new)
 
 
-        self.driver = main.main()
-
-        List = [1]
-
-        # 进行爬取
-        driver = main.browser_process(self.driver, self.url)
-        url_new, filename = main.create_file_and_write_novelname(driver, self.url)
-        driver = main.browser_process(driver, url_new)
-        num = 0
-        while self._stop:
-            num += 1
-            print(f'正在获取-第{num}个链接')
-            if main.iselement(driver, '//*[@id="content_read"]/div/div[2]/h1'):
-                title = driver.find_element_by_xpath('//*[@id="content_read"]/div/div[2]/h1').text  # 获取标题
-                if main.isrepeat(filename, title, List):
-                    print('重复章节，跳过!')
-                    driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').click()
-                    continue
-                else:
-                    main.crawl_conten(driver, filename, self.url)
-                    # 点击下一章
-                    if self.url != driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').get_attribute(
-                            'href'):
+            num = 0
+            while self._stop:
+                num += 1
+                print(f'正在获取-第{num}个链接')
+                if main.iselement(driver, '//*[@id="content_read"]/div/div[2]/h1'):
+                    title = driver.find_element_by_xpath('//*[@id="content_read"]/div/div[2]/h1').text  # 获取标题
+                    if main.isrepeat(filename, title, List):
+                        print('重复章节，跳过!')
                         driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').click()
+                        continue
                     else:
-                        print(f'output/{filename}获取完毕')
-                        break
-            else:
-                driver.find_element_by_xpath('//*[@id="list"]/dl/dd[1]/a').click()  # 点击第一章
-        # close
-        driver.quit()
+                        main.crawl_conten(driver, filename, self.url)
+                        # 点击下一章
+                        if self.url != driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').get_attribute(
+                                'href'):
+                            driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').click()
+                        else:
+                            print(f'output/{filename}获取完毕')
+                            break
+                else:
+                    driver.find_element_by_xpath('//*[@id="list"]/dl/dd[1]/a').click()  # 点击第一章
+            # close
+            #driver.quit()
 
-        self.finished.emit()  # 发射任务完成的信号
-
+            self.finished.emit()  # 发射任务完成的信号
+        except:
+            self.finished.emit()
     def stop(self):
         self._stop = False
 
@@ -227,6 +231,7 @@ class Outoutwritten(QMainWindow, Ui_MainWindow):
 
     def on_crawler_finished(self):
         self.crawler_thread._stop = True
+        self.crawler_thread.driver.quit()
         print("爬虫任务结束")  # 这里可以添加任务完成后的操作
 
     # def starttimer(self, flag):

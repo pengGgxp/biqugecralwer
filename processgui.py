@@ -133,17 +133,23 @@ class CrawlerThread(QThread):
                     title = driver.find_element_by_xpath('//*[@id="content_read"]/div/div[2]/h1').text  # 获取标题
                     if main.isrepeat(filename, title, List):
                         print('重复章节，跳过!')
-                        driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').click()
+                        if main.iselement(driver, '//*[@id="content_read"]/div/div[3]/a[3]'):
+                            driver.find_element_by_xpath('//*[@id="content_read"]/div/div[3]/a[3]').click()
+                        else:
+                            driver.refresh()
                         continue
                     else:
-                        main.crawl_conten(driver, filename, self.url)
+                        main.crawl_conten(driver, filename)
                         # 点击下一章
-                        if self.url != driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').get_attribute(
-                                'href'):
-                            driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').click()
+                        if main.iselement(driver, '//*[@id="content_read"]/div/div[3]/a[3]'):
+                            if self.url != driver.find_element_by_xpath(
+                                    '//*[@id="content_read"]/div/div[3]/a[3]').get_attribute('href'):
+                                driver.find_element_by_xpath('//*[@id="content_read"]/div/div[3]/a[3]').click()
+                            else:
+                                print(f'output/{filename}获取完毕')
+                                break
                         else:
-                            print(f'output/{filename}获取完毕')
-                            break
+                            driver.refresh()
                 else:
                     driver.find_element_by_xpath('//*[@id="list"]/dl/dd[1]/a').click()  # 点击第一章
             # close

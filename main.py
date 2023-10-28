@@ -79,7 +79,7 @@ def isrepeat(filename, title, List):
 
 
 
-def crawl_conten(driver, filename, start):
+def crawl_conten(driver, filename):
     # 爬取内容
     if iselement(driver, '//*[@id="list"]/dl/dd[1]/a'):
         driver.find_element_by_xpath('//*[@id="list"]/dl/dd[1]/a').click()  # 点击第一章
@@ -93,7 +93,7 @@ def crawl_conten(driver, filename, start):
         file.write(content + '\n\n')
     # 存储进度
     with open('tmp/tmp_' + filename, 'w+', encoding='utf-8') as tmp:
-        tmp.write(driver.find_element_by_xpath('//*[@id="content_read"]/div/div[6]/a[3]').get_attribute('href'))
+        tmp.write(driver.find_element_by_xpath('//*[@id="content_read"]/div/div[3]/a[3]').get_attribute('href'))
     tmp.close()
 
 
